@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { fetchProducts } from '../../store/productsThunks';
-import { deleteProduct, editProduct, addProduct } from '../../store/productSlice';
+import { deleteProduct, addProduct } from '../../store/productSlice';
 import { StyledInput, Table, Td, TdPhoto, Th, Button, TdButtons, Img, AddProductButton } from './styles';
 import ProductImages from 'components/ProductImages/ProductImages';
 import Delete from '../../assets/images/Trash.svg';
-import Edit from '../../assets/images/Edit.svg';
+// import Edit from '../../assets/images/Edit.svg';
 import AddProductForm from '../AddProductForm/AddProductForm';
 import Modal from 'components/ModalWindow/ModalWindow';
 
@@ -18,11 +18,13 @@ const ProductList = () => {
   const [sortOrder, setSortOrder] = useState('asc');
   const [modalOpen, setModalOpen] = useState(false);
 
-  const originalProducts = productsData.products;
+  const originalProducts = Array.isArray(productsData.products) ? productsData.products : [];
 
   useEffect(() => {
-    dispatch(fetchProducts());
-  }, [dispatch]);
+    if (originalProducts.length === 0) {
+      dispatch(fetchProducts());
+    }
+  }, [dispatch, originalProducts]);
 
   const sortedProducts = [...originalProducts].sort((a, b) => {
     if (sortOrder === 'asc') {
@@ -36,9 +38,10 @@ const ProductList = () => {
     dispatch(deleteProduct(productId));
   };
 
-  const handleEdit = (product) => {
-    dispatch(editProduct(product));
-  };
+  // const handleEdit = (product) => {
+  //   console.log("Edit button clicked:", product);
+  //   dispatch(editProduct(product));
+  // };
 
   const filterProducts = (products, query) => {
     return products.filter((product) => {
@@ -77,13 +80,13 @@ const ProductList = () => {
 
   const closeModal = () => {
     setModalOpen(false);
+    window.scrollTo({left: 0, top: document.body.scrollHeight, behavior: "smooth" });
   };
 
   const filteredProducts = filterProducts(sortedProducts, searchQuery);
 
   return (
     <div>
-      {/* Поле поиска */}
       <StyledInput
         type="text"
         placeholder="Пошук по назві або автору"
@@ -97,7 +100,7 @@ const ProductList = () => {
 
       {modalOpen && (
         <Modal isOpen={modalOpen} onClose={closeModal}>
-          <AddProductForm addProductToTable={addProductToTable} />
+          <AddProductForm addProductToTable={addProductToTable}  products={productsData.products}/>
         </Modal>
       )}
 
@@ -141,9 +144,9 @@ const ProductList = () => {
                 <Button onClick={() => handleDelete(product.id)}>
                   <Img src={Delete} alt="Delete" />
                 </Button>
-                <Button onClick={() => handleEdit(product)}>
+                {/* <Button onClick={() => handleEdit(product)}>
                   <Img src={Edit} alt="Edit" />
-                </Button>
+                </Button> */}
               </TdButtons>
             </tr>
           ))}

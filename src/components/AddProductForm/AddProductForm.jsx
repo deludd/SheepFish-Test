@@ -8,13 +8,6 @@ import {
 } from './styles';
 import InputField from 'components/InputField/InputField';
 
-const initialValues = {
-  title: '',
-  description: '',
-  price: '',
-  rating: '',
-};
-
 const validationSchema = Yup.object({
   title: Yup.string().required('Назва товару обовʼязкова'),
   description: Yup.string().required('Автор обовʼязковий'),
@@ -30,7 +23,18 @@ const validationSchema = Yup.object({
     .required('Рейтинг обовʼязковий'),
 });
 
-const AddProductForm = ({ addProductToTable }) => {
+const AddProductForm = ({ addProductToTable, products }) => {
+
+  const maxId = Math.max(...products.map(product => product.id));
+
+  const initialValues = {
+    id: maxId + 1,
+    title: '',
+    description: '',
+    price: '',
+    rating: '',
+  };
+
   const [formSubmitted, setFormSubmitted] = useState(false);
 
   const handleSubmit = (values, { resetForm }) => {

@@ -52,8 +52,6 @@ const ProductImages = ({ images }) => {
           )}
         </>
       )}
-
-      {/* Отобразите пустую картинку, если images пусто или не определено */}
       {(!images || images.length === 0) && (
         <div>
           <img src="path/to/empty-image-placeholder.png" alt="Empty Image" />
