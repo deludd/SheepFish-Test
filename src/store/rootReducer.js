@@ -1,9 +1,8 @@
 import { combineReducers } from 'redux';
-import productsReducer from './productsReducer';
+import productReducer from './productSlice';
 
 const rootReducer = combineReducers({
-  products: productsReducer,
-  // Додавайте інші редюсери тут, якщо вони є
+  products: productReducer,
 });
 
 export default rootReducer;

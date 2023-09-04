@@ -1,89 +1,154 @@
-import React, { useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { deleteProduct, updateProduct } from './productsActions';
-import { getAllProducts } from './productThunk'; // Імпортуйте функцію для отримання товарів
+import { fetchProducts } from '../../store/productsThunks';
+import { deleteProduct, editProduct, addProduct } from '../../store/productSlice';
+import { StyledInput, Table, Td, TdPhoto, Th, Button, TdButtons, Img, AddProductButton } from './styles';
+import ProductImages from 'components/ProductImages/ProductImages';
+import Delete from '../../assets/images/Trash.svg';
+import Edit from '../../assets/images/Edit.svg';
+import AddProductForm from '../AddProductForm/AddProductForm';
+import Modal from 'components/ModalWindow/ModalWindow';
 
 const ProductList = () => {
-  const products = useSelector((state) => state.products);
   const dispatch = useDispatch();
+  const productsData = useSelector((state) => state.products);
 
-  // Виклик getAllProducts при завантаженні компонента
+  const [searchQuery, setSearchQuery] = useState('');
+  const [sortBy, setSortBy] = useState('id');
+  const [sortOrder, setSortOrder] = useState('asc');
+  const [modalOpen, setModalOpen] = useState(false);
+
+  const originalProducts = productsData.products;
+
   useEffect(() => {
-    dispatch(getAllProducts());
+    dispatch(fetchProducts());
   }, [dispatch]);
 
-  // Локальний стан для сортування та фільтрації
-  const [sortBy, setSortBy] = useState('id'); // За замовчуванням сортування за ID
-  const [filter, setFilter] = useState('');
+  const sortedProducts = [...originalProducts].sort((a, b) => {
+    if (sortOrder === 'asc') {
+      return a[sortBy] > b[sortBy] ? 1 : -1;
+    } else {
+      return a[sortBy] < b[sortBy] ? 1 : -1;
+    }
+  });
 
-  // Функція для сортування
-  const sortedProducts = [...products].sort((a, b) =>
-    a[sortBy] > b[sortBy] ? 1 : -1
-  );
+  const handleDelete = (productId) => {
+    dispatch(deleteProduct(productId));
+  };
 
-  // Функція для фільтрації за назвою або категорією
-  const filteredProducts = sortedProducts.filter(
-    (product) =>
-      product.title.toLowerCase().includes(filter.toLowerCase()) ||
-      product.category.toLowerCase().includes(filter.toLowerCase())
-  );
+  const handleEdit = (product) => {
+    dispatch(editProduct(product));
+  };
+
+  const filterProducts = (products, query) => {
+    return products.filter((product) => {
+      const searchableFields = [product.title, product.description];
+      const lowerCaseQuery = query.toLowerCase().trim();
+
+      if (!lowerCaseQuery) {
+        return true;
+      }
+
+      return searchableFields.some((field) => field.toLowerCase().includes(lowerCaseQuery));
+    });
+  };
+
+  const handleSearch = (e) => {
+    const query = e.target.value;
+    setSearchQuery(query);
+  };
+
+  const handleSort = (column) => {
+    if (column === sortBy) {
+      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortBy(column);
+      setSortOrder('asc');
+    }
+  };
+
+  const addProductToTable = (newProduct) => {
+    dispatch(addProduct(newProduct));
+  };
+
+  const openModal = () => {
+    setModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setModalOpen(false);
+  };
+
+  const filteredProducts = filterProducts(sortedProducts, searchQuery);
 
   return (
     <div>
-      <input
+      {/* Поле поиска */}
+      <StyledInput
         type="text"
-        placeholder="Пошук за назвою або категорією"
-        value={filter}
-        onChange={(e) => setFilter(e.target.value)}
+        placeholder="Пошук по назві або автору"
+        value={searchQuery}
+        onChange={handleSearch}
       />
-      <table>
+
+      <div>
+        <AddProductButton onClick={openModal}>Додати товар</AddProductButton>
+      </div>
+
+      {modalOpen && (
+        <Modal isOpen={modalOpen} onClose={closeModal}>
+          <AddProductForm addProductToTable={addProductToTable} />
+        </Modal>
+      )}
+
+      <Table>
         <thead>
           <tr>
-            <th onClick={() => setSortBy('id')}>ID</th>
-            <th onClick={() => setSortBy('title')}>Назва</th>
-            <th onClick={() => setSortBy('description')}>Опис</th>
-            <th onClick={() => setSortBy('price')}>Ціна</th>
-            <th onClick={() => setSortBy('thumbnail')}>Фото</th>
-            <th onClick={() => setSortBy('rating')}>Рейтинг</th>
-            <th onClick={() => setSortBy('stock')}>Сток</th>
-            <th onClick={() => setSortBy('category')}>Категорія</th>
-            <th>Дії</th>
+            <Th onClick={() => handleSort('id')}>
+              ID {sortBy === 'id' && (sortOrder === 'asc' ? '▲' : '▼')}
+            </Th>
+            <Th onClick={() => handleSort('title')}>
+              Назва {sortBy === 'title' && (sortOrder === 'asc' ? '▲' : '▼')}
+            </Th>
+            <Th onClick={() => handleSort('author')}>
+              Автор {sortBy === 'author' && (sortOrder === 'asc' ? '▲' : '▼')}
+            </Th>
+            <Th onClick={() => handleSort('year')}>
+              Ціна {sortBy === 'year' && (sortOrder === 'asc' ? '▲' : '▼')}
+            </Th>
+            <Th>Фото</Th>
+            <Th onClick={() => handleSort('rating')}>
+              Рейтинг {sortBy === 'rating' && (sortOrder === 'asc' ? '▲' : '▼')}
+            </Th>
+            <Th onClick={() => handleSort('stock')}>
+              В наявності {sortBy === 'stock' && (sortOrder === 'asc' ? '▲' : '▼')}
+            </Th>
           </tr>
         </thead>
         <tbody>
           {filteredProducts.map((product) => (
             <tr key={product.id}>
-              <td>{product.id}</td>
-              <td>{product.title}</td>
-              <td>{product.description}</td>
-              <td>{product.price}</td>
-              <td>
-                <img src={product.thumbnail} alt={product.title} />
-              </td>
-              <td>{product.rating}</td>
-              <td>{product.stock}</td>
-              <td>{product.category}</td>
-              <td>
-                <button onClick={() => dispatch(deleteProduct(product.id))}>
-                  Видалити
-                </button>
-                <button
-                  onClick={() =>
-                    dispatch(
-                      updateProduct({
-                        ...product,
-                        price: product.price * 2,
-                      })
-                    )
-                  }
-                >
-                  Оновити
-                </button>
-              </td>
+              <Td>{product.id}</Td>
+              <Td>{product.title}</Td>
+              <Td>{product.description}</Td>
+              <Td>{product.price}</Td>
+              <TdPhoto>
+                <ProductImages images={product.images} />
+              </TdPhoto>
+              <Td>{product.rating}</Td>
+              <Td>{product.stock ? 'Так' : 'Ні'}</Td>
+              <TdButtons>
+                <Button onClick={() => handleDelete(product.id)}>
+                  <Img src={Delete} alt="Delete" />
+                </Button>
+                <Button onClick={() => handleEdit(product)}>
+                  <Img src={Edit} alt="Edit" />
+                </Button>
+              </TdButtons>
             </tr>
           ))}
         </tbody>
-      </table>
+      </Table>
     </div>
   );
 };

@@ -4,14 +4,25 @@
   "author": "Dymytrov Artem",
   "private": true,
   "dependencies": {
+    "@reduxjs/toolkit": "^1.9.5",
+    "@types/react": "^18.2.21",
     "axios": "^1.5.0",
+    "formik": "^2.4.3",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
+    "react-elastic-carousel": "^0.11.5",
     "react-redux": "^8.1.2",
+    "react-responsive-carousel": "^3.2.23",
     "react-router-dom": "^6.15.0",
     "react-scripts": "5.0.0",
+    "react-slick": "^0.29.0",
     "redux": "^4.1.2",
-    "styled-components": "^6.0.7"
+    "redux-thunk": "^2.4.2",
+    "redux-toolkit": "^1.1.2",
+    "reselect": "^4.1.8",
+    "slick-carousel": "^1.8.1",
+    "styled-components": "^6.0.7",
+    "yup": "^1.2.0"
   },
   "scripts": {
     "start": "react-scripts start",

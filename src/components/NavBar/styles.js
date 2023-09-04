@@ -22,7 +22,6 @@ export const Header = styled.div`
   background-size: cover;
   background-color: var(--primary);
 
-  /* Добавляем flex-контейнер и выравниваем элементы по центру */
   display: flex;
   align-items: center;
   justify-content: flex-start;
@@ -33,11 +32,10 @@ export const Arrow = styled(Link)`
   img {
     width: 30px;
     height: 30px;
-    transition: transform 0.2s ease-in-out; /* Плавное изменение transform при ховере */
+    transition: transform 0.2s ease-in-out;
   }
 
-  /* Применяем анимацию при ховере */
   &:hover img {
-    animation: ${bounceAnimation} 1.5s ease infinite; /* Используем анимацию скачка (bounce) при ховере */
+    animation: ${bounceAnimation} 1.5s ease infinite;
   }
 `;
