@@ -5,7 +5,6 @@ import { deleteProduct, addProduct } from '../../store/productSlice';
 import { StyledInput, Table, Td, TdPhoto, Th, Button, TdButtons, Img, AddProductButton } from './styles';
 import ProductImages from 'components/ProductImages/ProductImages';
 import Delete from '../../assets/images/Trash.svg';
-// import Edit from '../../assets/images/Edit.svg';
 import AddProductForm from '../AddProductForm/AddProductForm';
 import Modal from 'components/ModalWindow/ModalWindow';
 
@@ -37,11 +36,6 @@ const ProductList = () => {
   const handleDelete = (productId) => {
     dispatch(deleteProduct(productId));
   };
-
-  // const handleEdit = (product) => {
-  //   console.log("Edit button clicked:", product);
-  //   dispatch(editProduct(product));
-  // };
 
   const filterProducts = (products, query) => {
     return products.filter((product) => {
@@ -144,9 +138,6 @@ const ProductList = () => {
                 <Button onClick={() => handleDelete(product.id)}>
                   <Img src={Delete} alt="Delete" />
                 </Button>
-                {/* <Button onClick={() => handleEdit(product)}>
-                  <Img src={Edit} alt="Edit" />
-                </Button> */}
               </TdButtons>
             </tr>
           ))}

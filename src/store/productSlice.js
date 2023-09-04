@@ -30,16 +30,8 @@ const productSlice = createSlice({
       state.products = state.products.filter(product => product.id !== productId);
       localStorage.setItem('products', JSON.stringify(state.products));
     },
-    editProduct: (state, action) => {
-      const updatedProduct = action.payload;
-      const index = state.products.findIndex(product => product.id === updatedProduct.id);
-      if (index !== -1) {
-        state.products[index] = updatedProduct;
-        localStorage.setItem('products', JSON.stringify(state.products));
-      }
-    },
   },
 });
 
-export const { addProduct, deleteProduct, editProduct, setProducts } = productSlice.actions;
+export const { addProduct, deleteProduct, setProducts } = productSlice.actions;
 export default productSlice.reducer;
